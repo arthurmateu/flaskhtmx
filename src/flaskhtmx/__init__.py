@@ -5,7 +5,7 @@ from flask import Flask, render_template
 feed = {
     "title": "The Teclado Blog",
     "href": "https://blog.teclado.com/rss/",
-    "show_iamges": True,
+    "show_images": True,
     "entries": {}
 }
 
@@ -22,6 +22,6 @@ def create_app():
             if entry.link not in feed["entries"]:
                 feed["entries"][entry.link] = entry
 
-        return render_template("feed.html", feed=feed)
+        return render_template("feed.html", feed=feed, entries=feed["entries"].values())
 
     return app
