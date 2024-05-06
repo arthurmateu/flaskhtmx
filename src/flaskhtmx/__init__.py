@@ -1,6 +1,6 @@
 import jinja_partials
 import feedparser
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 feeds = {
     "https://blog.teclado.com/rss/": {"title": "The Teclado Blog", "href": "https://blog.teclado.com/rss/", "show_images": True, "entries": {}},
@@ -19,7 +19,7 @@ def create_app():
             parsed_feed = feedparser.parse(url)
             for entry in parsed_feed.entries:
                 if entry.link not in feed_["entries"]:
-                    feed_["entries"][entry.link] = entry
+                    feed_["entries"][entry.link] = {**entry, "read": False}
 
         if feed_url is None:
             feed = list(feeds.values())[0]
@@ -27,5 +27,23 @@ def create_app():
             feed = feeds[feed_url]
 
         return render_template("feed.html", feed=feed, entries=feed["entries"].values(), feeds=feeds)
+
+    
+    @app.route("/entries/<path:feed_url>")
+    def render_feed_entries(feed_url: str):
+        try:
+            feed = feeds[feed_url]
+        except KeyError:
+            abort(400)
+
+        page = int(request.args.get("page", 0))
+
+        return render_template(
+            "partials/entry_page.html",
+            entries=list(feed["entries"].values())[page*5:page*5+5],
+            href=feed_url,
+            page=page,
+            max_page=len(feed["entries"])//5
+        )
 
     return app
