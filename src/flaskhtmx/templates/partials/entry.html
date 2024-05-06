@@ -27,7 +27,7 @@ A rendered summarized entry
                 }}</span>
         </p>
         <p class="leading-6 mb-2">{{ summary | safe }}</p>
-        <a x-on:click="read = true" href="{{ url_for('read_entry', feed_url=feed_url, entry_url=link) }}"
+        <a x-on:click="$dispatch('read', { read: read }); read = true;" href="{{ url_for('read_entry', feed_url=feed_url, entry_url=link) }}"
             class="underline" target="_blank">Read article</a>
     </div>
 </article>
