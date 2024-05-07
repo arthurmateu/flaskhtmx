@@ -1,6 +1,6 @@
 import jinja_partials
 import feedparser
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 
 feeds = {
     "https://blog.teclado.com/rss/": {"title": "The Teclado Blog", "href": "https://blog.teclado.com/rss/", "show_images": True, "entries": {}},
@@ -52,6 +52,15 @@ def create_app():
         entry = feed["entries"][entry_url]
         entry["read"] = True
         return redirect(entry_url)
+    
+    
+    @app.route("/add_feed", methods=["POST"])
+    def add_feed():
+        feed = request.form.get("url")
+        title = request.form.get("title")
+        show_images = request.form.get("showImages") == "on"
+        feeds[feed] = {"title": title, "href": feed, "show_images": show_images, "entries": {}}
+        return redirect(url_for("render_feed", feed=feed))
 
 
     return app
